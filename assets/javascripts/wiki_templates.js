@@ -41,63 +41,67 @@ $(function() {
 	  return week < 10 ? '0' + week : week;
 	}
 
-	var base_url = $('body.controller-wiki #main-menu a.wiki').attr('href').replace(/\/(date_index|index)$/, '')
+	var base_url = $('body.controller-wiki #main-menu a.wiki').attr('href')
 
-	var new_page = $('<a href="#">New page</a>')
-		.click(function() {
-			var name = prompt("Page title:");
-			if (name) {
-			  window.location.href = base_url + "/" + encodeURI(name);
-			}
-		});
+	if (base_url) {
+		base_url = base_url.replace(/\/(date_index|index)$/, '');
 
-	var new_todo = $('<a href="#">New todo</a>')
-		.click(function() {
-			var name = prompt("Todo list name:");
-			var template = "* {{todo}} Task 1 — {{user(admin)}}\n* {{done}} Task 2 — {{user(admin)}}\n";
-			if (name) {
-				window.location.href = base_url + "/" + encodeURI(dmy() + ' Todo ' + name) + '?text=' + encodeURI(template);
-			}
-		});
+		var new_page = $('<a href="#">New page</a>')
+			.click(function() {
+				var name = prompt("Page title:");
+				if (name) {
+				  window.location.href = base_url + "/" + encodeURI(name);
+				}
+			});
 
-	var new_minutes = $('<a href="#">New meeting minutes</a>')
-		.click(function() {
-			var name = prompt("Meeting title:");
-			var template = "Attendees:\n* \n\nAgenda:\n* \n\nMinutes:\n* ";
-			if (name) {
-				window.location.href = base_url + "/" + encodeURI(dmy() + ' Meeting ' + name) + '?text=' + encodeURI(template);
-			}
-		});
+		var new_todo = $('<a href="#">New todo</a>')
+			.click(function() {
+				var name = prompt("Todo list name:");
+				var template = "* {{todo}} Task 1 — {{user(admin)}}\n* {{done}} Task 2 — {{user(admin)}}\n";
+				if (name) {
+					window.location.href = base_url + "/" + encodeURI(dmy() + ' Todo ' + name) + '?text=' + encodeURI(template);
+				}
+			});
 
-	var new_roadmap = $('<a href="#">New roadmap</a>')
-		.click(function() {
-			var name = prompt("Roadmap title :", "Roadmap");
-			var week = 7 * 24 * 3600 * 1000;
-			var weeks = "";
-			var emptyWeeks = "";
-			var today = (new Date()).getTime();
-			for (var i = 0; i < 10; i++) {
-				var d = new Date(today + (i * week));
-				weeks += "_. W" + getWeek(d) + " |";
-				emptyWeeks += "       |";
-			}
-			var template = "|                  |" + weeks + "\n" +
-				"| *_GROUP 1_* |\n" +
-				"| {{issue(00001)}} |" + emptyWeeks  + "\n" +
-				"| *_GROUP 2_* |\n" +
-				"| {{issue(00001)}} |" + emptyWeeks  + "\n";
-			if (name) {
-				window.location.href = base_url + "/" + encodeURI(name) + '?text=' + encodeURI(template);
-			}
-		});
+		var new_minutes = $('<a href="#">New meeting minutes</a>')
+			.click(function() {
+				var name = prompt("Meeting title:");
+				var template = "Attendees:\n* \n\nAgenda:\n* \n\nMinutes:\n* ";
+				if (name) {
+					window.location.href = base_url + "/" + encodeURI(dmy() + ' Meeting ' + name) + '?text=' + encodeURI(template);
+				}
+			});
 
-	$("body.controller-wiki #main #sidebar h3:first")
-		.after("<br><br>")
-		.after(new_roadmap)
-		.after("<br>")
-		.after(new_minutes)
-		.after("<br>")
-		.after(new_todo)
-		.after("<br>")
-		.after(new_page)
+		var new_roadmap = $('<a href="#">New roadmap</a>')
+			.click(function() {
+				var name = prompt("Roadmap title :", "Roadmap");
+				var week = 7 * 24 * 3600 * 1000;
+				var weeks = "";
+				var emptyWeeks = "";
+				var today = (new Date()).getTime();
+				for (var i = 0; i < 10; i++) {
+					var d = new Date(today + (i * week));
+					weeks += "_. W" + getWeek(d) + " |";
+					emptyWeeks += "       |";
+				}
+				var template = "|                  |" + weeks + "\n" +
+					"| *_GROUP 1_* |\n" +
+					"| {{issue(00001)}} |" + emptyWeeks  + "\n" +
+					"| *_GROUP 2_* |\n" +
+					"| {{issue(00001)}} |" + emptyWeeks  + "\n";
+				if (name) {
+					window.location.href = base_url + "/" + encodeURI(name) + '?text=' + encodeURI(template);
+				}
+			});
+
+		$("body.controller-wiki #main #sidebar h3:first")
+			.after("<br><br>")
+			.after(new_roadmap)
+			.after("<br>")
+			.after(new_minutes)
+			.after("<br>")
+			.after(new_todo)
+			.after("<br>")
+			.after(new_page);
+	}
 });
