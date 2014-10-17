@@ -41,7 +41,7 @@ $(function() {
 	  return week < 10 ? '0' + week : week;
 	}
 
-	var base_url = $('body.controller-wiki #main-menu a.wiki').attr('href');
+	var base_url = $('body.controller-wiki #main-menu a.wiki').attr('href').replace(/\/(date_index|index)$/, '')
 
 	var new_page = $('<a href="#">New page</a>')
 		.click(function() {
