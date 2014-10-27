@@ -2,7 +2,7 @@ Redmine::Plugin.register :redmine_wiki_templates do
 	name 'Redmine Wiki Templates plugin'
 	author 'Florent Solt'
 	description 'Add wiki page thanks to a template'
-	version '0.0.1'
+	version '0.1.0'
 	url 'https://github.com/florentsolt/redmine_wiki_templates'
 
 	settings :default => {
