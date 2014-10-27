@@ -4,12 +4,32 @@ Redmine::Plugin.register :redmine_wiki_templates do
 	description 'Add wiki page thanks to a template'
 	version '0.0.1'
 	url 'https://github.com/florentsolt/redmine_wiki_templates'
+
+	settings :default => {
+		'templates' => [{
+				:confirm => true,
+				:label => "New page",
+				:title => "",
+				:content => ""
+			},{
+				:confirm => true,
+				:label => "New todo",
+				:title => "Todo",
+				:content => "* {{todo}} Task 1 — {{user(admin)}}\n* {{done}} Task 2 — {{user(admin)}}\n* {{progress(50)}} Task 3 — {{user(admin)}}"
+			},{
+				:confirm => true,
+				:label => "New meeting minutes",
+				:title => "%year%-%month%-%day% Meeting minutes",
+				:content => "Attendees:\n* \n\nAgenda:\n* \n\nMinutes:\n* "
+			}].to_json,
+		}, :partial => 'settings/wiki_templates'
 end
 
 class WikiTemplatesViewListener < ::Redmine::Hook::ViewListener
 	# Adds javascript and stylesheet tags
 	def view_layouts_base_html_head(context)
-		javascript_include_tag("wiki_templates.js", :plugin => "redmine_wiki_templates")
+		javascript_include_tag("wiki_templates.js", :plugin => "redmine_wiki_templates") +
+		"<script type='text/javascript'>wiki_templates_settings = #{Setting.plugin_redmine_wiki_templates['templates']};</script>".html_safe
 	end
 end
 
@@ -45,6 +65,11 @@ Redmine::WikiFormatting::Macros.register do
 	desc "Todo (completed)"
 	macro :done do |obj, args|
 		"<input type='checkbox' disabled='disabled' checked='checked'> ".html_safe
+	end
+
+	desc "Progress"
+	macro :progress do |obj, args|
+		"<progress value='#{args[0].to_i}' max='100'></progress> ".html_safe
 	end
 
 	desc "User avatar and link"

@@ -1,19 +1,13 @@
 $(function() {
 
-	function dmy() {
-		var date = new Date();
-		var d  = date.getDate();
-		var day = (d < 10) ? '0' + d : d;
-		var m = date.getMonth() + 1;
-		var month = (m < 10) ? '0' + m : m;
-		var yy = date.getYear();
-		var year = (yy < 1000) ? yy + 1900 : yy;
-		return year + "-" + month + "-" + day;
-	}
-
-	function getWeek(date) {
+	function getWeek(offset) {
 	  // Create a copy of this date object
-	  var target  = new Date(date.valueOf());
+	  var date  = new Date();
+
+	  // Apply the week ofset
+	  if (offset) {
+	  	date.setDate(date.getDate() + parseInt(offset) * 7);
+	  }
 
 	  // ISO week date weeks start on monday
 	  // so correct the day number
@@ -21,87 +15,67 @@ $(function() {
 
 	  // ISO 8601 states that week 1 is the week
 	  // with the first thursday of that year.
-	  // Set the target date to the thursday in the target week
-	  target.setDate(target.getDate() - dayNr + 3);
+	  // Set the date to the thursday in the date week
+	  date.setDate(date.getDate() - dayNr + 3);
 
-	  // Store the millisecond value of the target date
-	  var firstThursday = target.valueOf();
+	  // Store the millisecond value of the date
+	  var firstThursday = date.valueOf();
 
-	  // Set the target to the first thursday of the year
-	  // First set the target to january first
-	  target.setMonth(0, 1);
+	  // Set the date to the first thursday of the year
+	  // First set the date to january first
+	  date.setMonth(0, 1);
 	  // Not a thursday? Correct the date to the next thursday
-	  if (target.getDay() != 4) {
-	    target.setMonth(0, 1 + ((4 - target.getDay()) + 7) % 7);
+	  if (date.getDay() != 4) {
+	    date.setMonth(0, 1 + ((4 - date.getDay()) + 7) % 7);
 	  }
 
 	  // The weeknumber is the number of weeks between the
-	  // first thursday of the year and the thursday in the target week
-	  var week = 1 + Math.ceil((firstThursday - target) / 604800000);
+	  // first thursday of the year and the thursday in the week
+	  var week = 1 + Math.ceil((firstThursday - date) / 604800000);
 	  return week < 10 ? '0' + week : week;
+	}
+
+	function replace(text) {
+		return text.replace(/%week%/m, function() {
+			return getWeek()
+		}).replace(/%week\+(\d+)%/, function(macth, offset) {
+			return getWeek(offset);
+		}).replace(/%day%/, function() {
+			var d  = new Date().getDate();
+			return (d < 10) ? '0' + d : d;
+		}).replace(/%month%/, function() {
+			var m  = new Date().getMonth() + 1;
+			return (m < 10) ? '0' + m : m;
+		}).replace(/%year%/, function() {
+			var y  = new Date().getYear();
+			return (y < 1000) ? y + 1900 : y;
+		});
 	}
 
 	var base_url = $('body.controller-wiki #main-menu a.wiki').attr('href')
 
-	if (base_url) {
+	if (wiki_templates_settings && base_url) {
 		base_url = base_url.replace(/\/(date_index|index)$/, '');
+		var links = $('<div></div>')
 
-		var new_page = $('<a href="#">New page</a>')
-			.click(function() {
-				var name = prompt("Page title:");
-				if (name) {
-				  window.location.href = base_url + "/" + encodeURI(name);
-				}
-			});
+		for (var i = 0; i < wiki_templates_settings.length; i++) {
+			var template = wiki_templates_settings[i];
 
-		var new_todo = $('<a href="#">New todo</a>')
-			.click(function() {
-				var name = prompt("Todo list name:");
-				var template = "* {{todo}} Task 1 — {{user(admin)}}\n* {{done}} Task 2 — {{user(admin)}}\n";
-				if (name) {
-					window.location.href = base_url + "/" + encodeURI(dmy() + ' Todo ' + name) + '?text=' + encodeURI(template);
-				}
-			});
+			var link = $('<a href="#"></a>')
+				.text(template.label)
+				.click(function() {
+					this.title = replace(this.title);
+					if (this.confirm) {
+						this.title = prompt("Wiki page title", this.title);
+					}
+					if (this.title) {
+						// TODO: use POST request
+						window.location.href = base_url + "/" + encodeURI(this.title) + '?text=' + encodeURI(replace(this.content));
+					}
+				}.bind(template));
+			links.append(link).append('<br>');
+		}
 
-		var new_minutes = $('<a href="#">New meeting minutes</a>')
-			.click(function() {
-				var name = prompt("Meeting title:");
-				var template = "Attendees:\n* \n\nAgenda:\n* \n\nMinutes:\n* ";
-				if (name) {
-					window.location.href = base_url + "/" + encodeURI(dmy() + ' Meeting ' + name) + '?text=' + encodeURI(template);
-				}
-			});
-
-		var new_roadmap = $('<a href="#">New roadmap</a>')
-			.click(function() {
-				var name = prompt("Roadmap title :", "Roadmap");
-				var week = 7 * 24 * 3600 * 1000;
-				var weeks = "";
-				var emptyWeeks = "";
-				var today = (new Date()).getTime();
-				for (var i = 0; i < 10; i++) {
-					var d = new Date(today + (i * week));
-					weeks += "_. W" + getWeek(d) + " |";
-					emptyWeeks += "       |";
-				}
-				var template = "|                  |" + weeks + "\n" +
-					"| *_GROUP 1_* |\n" +
-					"| {{issue(00001)}} |" + emptyWeeks  + "\n" +
-					"| *_GROUP 2_* |\n" +
-					"| {{issue(00001)}} |" + emptyWeeks  + "\n";
-				if (name) {
-					window.location.href = base_url + "/" + encodeURI(name) + '?text=' + encodeURI(template);
-				}
-			});
-
-		$("body.controller-wiki #main #sidebar h3:first")
-			.after("<br><br>")
-			.after(new_roadmap)
-			.after("<br>")
-			.after(new_minutes)
-			.after("<br>")
-			.after(new_todo)
-			.after("<br>")
-			.after(new_page);
+		$("body.controller-wiki #main #sidebar h3:first").after("<br>").after(links);
 	}
 });

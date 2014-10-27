@@ -1,0 +1,124 @@
+<div id="templates">
+    <input id="result" type="hidden" name="settings[templates]" value="<%= settings['templates'] %>">
+</div>
+<hr>
+<button id="add">Add</button>
+
+<script type="text/javascript">
+$(function() {
+    function add(template) {
+        var div = $('<div class="template" style="position:relative"></div>');
+        div.append('<hr>');
+
+        var controls = $('<div style="position: absolute; left: 1em; top: 2em;"></div>');
+        $('<button style="display:block">up</button>')
+            .appendTo(controls)
+            .click(function(event) {
+                event.preventDefault();
+                var parent = $(this).parent().parent();
+                var prev = parent.prev('.template');
+                if (prev) parent.insertBefore(prev);
+            });
+        $('<button style="display:block">down</button>')
+            .appendTo(controls)
+            .click(function(event) {
+                event.preventDefault();
+                var parent = $(this).parent().parent();
+                var next = parent.next('.template');
+                if (next) parent.insertAfter(next);
+            });
+        $('<br>')
+            .appendTo(controls);
+        $('<button style="display:block">remove</button>')
+            .appendTo(controls)
+            .click(function(event) {
+                event.preventDefault();
+                if (confirm("Are you sure?")) {
+                    $(this).parent().parent().remove();
+                }
+            })
+        div.append(controls);
+
+        var p = $('<p></p>');
+        $('<label>Sidebar label</label>').appendTo(p);
+        $('<input>')
+            .attr({type: "text", name:"label", value:template.label})
+            .appendTo(p);
+       div.append(p);
+
+       p = $('<p></p>');
+       $('<label>Wiki page title</label>').appendTo(p);
+       $('<input>')
+           .attr({type: "text", name:"title", value:template.title, size: 80})
+           .appendTo(p);
+       div.append(p);
+
+       p = $('<p></p>');
+       $('<label>Confirm title ?</label>').appendTo(p);
+       $('<input>')
+           .attr({type: "checkbox", name:"confirm", checked:template.confirm})
+           .appendTo(p);
+       div.append(p);
+
+       p = $('<p></p>');
+       $('<label>Wiki page content</label>').appendTo(p);
+       $('<textarea>')
+           .attr({name:"content", cols: 80, rows: 10})
+           .text(template.content)
+           .appendTo(p);
+       div.append(p);
+
+       $('#templates').append(div);
+   }
+
+    var p = $('<p></p>');
+    $('<div></div>')
+        .append('Feel free to use any of these keywords in your titles and contents:')
+        .append('<ul></ul>')
+        .appendTo(p);
+    $('#templates').append(p);
+
+    $('#templates ul').append('<li><strong>%week%</strong>: Week number of the current week</li>');
+    $('#templates ul').append('<li><strong>%week+N%</strong>: Week number of the N next week</li>');
+    $('#templates ul').append('<li><strong>%day%</strong>: Day number (2 digits) of today</li>');
+    $('#templates ul').append('<li><strong>%month%</strong>: Month number (2 digits) of today</li>');
+    $('#templates ul').append('<li><strong>%year%</strong>: Year number (4 digits) of today</li>');
+
+    $('<div></div>')
+        .append('Also consider these wiki macros in your contents:')
+        .append('<ul></ul>')
+        .appendTo(p);
+    $('#templates').append(p);
+
+    $('#templates ul:last').append('<li><strong>{{todo}}</strong>: Checkbox not checked</li>');
+    $('#templates ul:last').append('<li><strong>{{done}}</strong>: Checkbox checked</li>');
+    $('#templates ul:last').append('<li><strong>{{progress}}</strong>: Empty progress bar</li>');
+    $('#templates ul:last').append('<li><strong>{{progress(30)}}</strong>: Progress bar 30% filled</li>');
+    $('#templates ul:last').append('<li><strong>{{user(login)}}</strong>: Avatar and name of this user</li>');
+    $('#templates ul:last').append('<li><strong>{{issue(number)}}</strong>: Issue with title, status and assignee</li>');
+
+    for (var i = 0; i < wiki_templates_settings.length; i++) {
+        var template = wiki_templates_settings[i];
+        add(template);
+    }
+
+    $('#add').click(function(event) {
+        event.preventDefault();
+        add({});
+    });
+
+    $("#settings input[type=submit]").click(function(event) {
+        var templates = [];
+        $("#templates .template").each(function(i, template) {
+            templates.push({
+                label: $(template).find("input[name=label]").val(),
+                title: $(template).find("input[name=title]").val(),
+                content: $(template).find("textarea[name=content]").val(),
+                confirm: $(template).find("input[name=confirm]").prop("checked"),
+            });
+        })
+        $('#result').val(JSON.stringify(templates));
+    });
+});
+
+</script>
