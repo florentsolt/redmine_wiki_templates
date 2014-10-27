@@ -36,17 +36,17 @@ $(function() {
 	}
 
 	function replace(text) {
-		return text.replace(/%week%/m, function() {
+		return text.replace(/%week%/gm, function() {
 			return getWeek()
-		}).replace(/%week\+(\d+)%/, function(macth, offset) {
+		}).replace(/%week\+(\d+)%/gm, function(macth, offset) {
 			return getWeek(offset);
-		}).replace(/%day%/, function() {
+		}).replace(/%day%/gm, function() {
 			var d  = new Date().getDate();
 			return (d < 10) ? '0' + d : d;
-		}).replace(/%month%/, function() {
+		}).replace(/%month%/gm, function() {
 			var m  = new Date().getMonth() + 1;
 			return (m < 10) ? '0' + m : m;
-		}).replace(/%year%/, function() {
+		}).replace(/%year%/gm, function() {
 			var y  = new Date().getYear();
 			return (y < 1000) ? y + 1900 : y;
 		});
