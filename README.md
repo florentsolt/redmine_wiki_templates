@@ -7,3 +7,5 @@ redmine_wiki_templates
 ![Sample Template](template1.png)
 
 ![Sample Template](template2.png)
+
+![Settings](settings.png)
