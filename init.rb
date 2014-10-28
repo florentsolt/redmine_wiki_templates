@@ -2,7 +2,7 @@ Redmine::Plugin.register :redmine_wiki_templates do
 	name 'Redmine Wiki Templates plugin'
 	author 'Florent Solt'
 	description 'Add wiki page thanks to a template'
-	version '0.1.0'
+	version '0.1.1'
 	url 'https://github.com/florentsolt/redmine_wiki_templates'
 
 	settings :default => {
@@ -15,7 +15,7 @@ Redmine::Plugin.register :redmine_wiki_templates do
 				:confirm => true,
 				:label => "New todo",
 				:title => "Todo",
-				:content => "* {{todo}} Task 1 — {{user(admin)}}\n* {{done}} Task 2 — {{user(admin)}}\n* {{progress(50)}} Task 3 — {{user(admin)}}"
+				:content => "* {{todo}} Task 1 - {{user(admin)}}\n* {{done}} Task 2 - {{user(admin)}}\n* {{progress(50)}} Task 3 - {{user(admin)}}"
 			},{
 				:confirm => true,
 				:label => "New meeting minutes",
