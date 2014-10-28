@@ -70,7 +70,7 @@ $(function() {
 					}
 					if (this.title) {
 						// TODO: use POST request
-						window.location.href = base_url + "/" + encodeURI(this.title) + '?text=' + encodeURI(replace(this.content));
+						window.location.href = base_url + "/" + encodeURIComponent(this.title) + '?text=' + encodeURIComponent(replace(this.content));
 					}
 				}.bind(template));
 			links.append(link).append('<br>');
