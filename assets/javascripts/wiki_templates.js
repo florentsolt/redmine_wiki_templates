@@ -69,8 +69,13 @@ $(function() {
 						this.title = prompt("Wiki page title", this.title);
 					}
 					if (this.title) {
-						// TODO: use POST request
-						window.location.href = base_url + "/" + encodeURIComponent(this.title) + '?text=' + encodeURIComponent(replace(this.content));
+						$('<form>')
+							.attr({method: 'POST', action: base_url + "/" + encodeURIComponent(this.title)})
+							.append($('<input>').attr({type: 'hidden', name: 'text', value: replace(this.content)}))
+							.append($('<input>').attr({type: 'hidden', name: 'authenticity_token', value: $('meta[name=csrf-token]').attr('content')}))
+							.appendTo($('body'))
+							.submit();
+						// window.location.href = base_url + "/" + encodeURIComponent(this.title) + '?text=' + encodeURIComponent(replace(this.content));
 					}
 				}.bind(template));
 			links.append(link).append('<br>');
